@@ -1,36 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Guide JOJ Dakar 2026
 
-## Getting Started
+« Qu’est-ce que je peux faire maintenant, où, et comment y aller ? »
 
-First, run the development server:
+## Lancer
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+cp .env.example .env.local   # renseigner ADMIN_CODE (8+ caractères) et ANTHROPIC_API_KEY
+pnpm dev                     # http://localhost:3000
+pnpm test                    # règles du PRD (Vitest)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Base SQLite intégrée à Node (`node:sqlite`, Node ≥ 24) dans `data/guide.db`, créée au premier
+lancement avec les sites connus et un extrait de programme de démonstration (même journée type
+chaque jour des Jeux). Supprimer `data/guide.db` pour repartir de zéro.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tranches
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| | Écran | Règles |
+|---|---|---|
+| TR1 | `/` agenda du jour, filtre « en cours à » / « en cours maintenant » | début inclus, fin exclue ; heures de Dakar (UTC+0) |
+| TR2 | `/admin` : import JSON du programme | code d’accès (cookie signé 8 h, 5 essais / 15 min) ; fin ≤ début ou hors 31/10–13/11/2026 écartée (aussi `CHECK` en base) ; lieu inconnu écarté ; réimport sans doublon |
+| TR3 | `/admin` : bouton « Retirer » | code requis ; une animation retirée disparaît de toutes les lectures publiques |
+| TR4 | `/animations/[id]` : carte OpenStreetMap + temps à pied / en voiture | départ parmi les sites connus, sinon refusé ; estimation distance × 1,3, 5 km/h et 35 km/h |
+| TR5 | `/demander` : question → 3 animations max expliquées par Claude | question vide refusée ; seules les animations actives du jour encore à venir sont proposées, ids vérifiés côté serveur |
 
-## Learn More
+Format d’import : `[{ "titre", "description", "debut": "2026-11-07T14:00", "fin": "2026-11-07T16:00", "lieu": "Plage de Saly" }]`.
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Limites connues
+- Le droit de reprendre le programme officiel reste à vérifier (risque du PRD) ; les données de démo sont fictives.
+- Tracé de carte indicatif (ligne droite), pas un calcul d’itinéraire routier.
+- Limitation des essais admin en mémoire (réinitialisée au redémarrage).
