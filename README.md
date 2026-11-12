@@ -18,7 +18,8 @@ extrait de programme de démonstration (même journée type chaque jour des Jeux
 ## En ligne
 
 https://guide-joj-dakar.vercel.app — Vercel (projet `guide-joj-dakar`) + base Neon.
-Mise à jour : `npx vercel deploy --prod`. Variables de production : `ADMIN_CODE`, `ANTHROPIC_API_KEY`,
+Mise à jour automatique : chaque `git push` sur `main` redéploie le site
+(projet Vercel relié au dépôt GitHub `lady818/ayo-guide`). Variables de production : `ADMIN_CODE`, `ANTHROPIC_API_KEY`,
 `DATABASE_URL` (ajoutée par l’intégration Neon). Questions à l’IA limitées à 5 par personne
 et par 24 h, 500 / jour au total.
 
