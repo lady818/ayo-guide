@@ -108,3 +108,154 @@ h1, h2, h3 {
   z-index: 0;
   font-family: var(--font-sans);
 }
+
+/* ================= Ayo Guide — animations v2 ================= */
+
+/* Motif discret inspiré du wax sur le fond */
+body {
+  background-color: var(--color-sable);
+  background-image:
+    radial-gradient(circle at 1px 1px, rgb(15 81 50 / 0.07) 1.2px, transparent 0),
+    radial-gradient(circle at 12px 12px, rgb(245 179 1 / 0.10) 1.6px, transparent 0);
+  background-size: 24px 24px;
+}
+
+/* Bande « kente » animée */
+.kente {
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--color-soleil) 0 18px,
+    var(--color-terre) 18px 30px,
+    var(--color-baobab) 30px 48px,
+    #e8d9b5 48px 54px,
+    var(--color-ocean) 54px 66px,
+    #e8d9b5 66px 72px
+  );
+  background-size: 144px 100%;
+  animation: kente 6s linear infinite;
+}
+@keyframes kente { to { background-position: 144px 0; } }
+
+/* Aurore du bandeau d'accueil */
+.aurore { position: absolute; border-radius: 9999px; filter: blur(48px); opacity: 0.55; }
+.aurore-1 { animation: aurore-1 14s ease-in-out infinite alternate; }
+.aurore-2 { animation: aurore-2 18s ease-in-out infinite alternate; }
+.aurore-3 { animation: aurore-3 22s ease-in-out infinite alternate; }
+@keyframes aurore-1 { to { transform: translate(60%, 30%) scale(1.25); } }
+@keyframes aurore-2 { to { transform: translate(-50%, -20%) scale(0.85); } }
+@keyframes aurore-3 { to { transform: translate(30%, -40%) scale(1.15); } }
+
+/* Entrée d'Ayo : arrive en rebondissant, puis flotte ; salue au survol */
+.ayo-entree {
+  animation: ayo-entree 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) both, flottement 6s ease-in-out 0.9s infinite;
+}
+@keyframes ayo-entree {
+  0% { opacity: 0; transform: translateY(40px) scale(0.6) rotate(-8deg); }
+  100% { opacity: 1; transform: none; }
+}
+.ayo-salut:hover, .ayo-salut:focus-visible { animation: salut 0.8s ease-in-out; }
+@keyframes salut {
+  0%, 100% { transform: rotate(0); }
+  20% { transform: rotate(-7deg) scale(1.04); }
+  40% { transform: rotate(6deg) scale(1.04); }
+  60% { transform: rotate(-4deg); }
+  80% { transform: rotate(3deg); }
+}
+
+/* Bulle de dialogue qui « pop » */
+.bulle-pop { animation: bulle-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; transform-origin: bottom left; }
+@keyframes bulle-pop { from { opacity: 0; transform: scale(0.4); } to { opacity: 1; transform: none; } }
+
+/* Reflet qui balaie les boutons principaux */
+.brillant { position: relative; overflow: hidden; isolation: isolate; }
+.brillant::after {
+  content: "";
+  position: absolute;
+  inset: -20% auto -20% -60%;
+  width: 45%;
+  background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.55), transparent);
+  transform: skewX(-20deg);
+  animation: reflet 3.6s ease-in-out infinite;
+  z-index: -1;
+  pointer-events: none;
+}
+@keyframes reflet { 0%, 60% { left: -60%; } 100% { left: 130%; } }
+
+/* Titres en dégradé animé */
+.texte-soleil {
+  background: linear-gradient(90deg, #ffd34d, #f5b301, #ff9a3c, #ffd34d);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: degrade 6s ease-in-out infinite;
+}
+@keyframes degrade { 50% { background-position: 100% 0; } }
+
+/* Cartes : apparition au défilement (navigateurs compatibles) */
+@supports (animation-timeline: view()) {
+  .revele {
+    animation: revele linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 22%;
+  }
+  @keyframes revele {
+    from { opacity: 0; transform: translateY(28px) scale(0.97); }
+    to { opacity: 1; transform: none; }
+  }
+}
+
+/* Barre de progression d'une animation en cours */
+.progression > span { transform-origin: left; animation: remplir 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s both; }
+@keyframes remplir { from { transform: scaleX(0); } }
+
+/* Pastille du jour choisi */
+.pop { animation: pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+@keyframes pop { from { transform: scale(0.8); } to { transform: none; } }
+
+/* Points « Ayo écrit… » */
+.points > span { display: inline-block; width: 7px; height: 7px; border-radius: 9999px; background: currentColor; animation: point 1.2s ease-in-out infinite; }
+.points > span:nth-child(2) { animation-delay: 0.15s; }
+.points > span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes point { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-6px); opacity: 1; } }
+
+/* Ayo qui réfléchit */
+.reflechit { animation: reflechit 1.6s ease-in-out infinite; }
+@keyframes reflechit { 0%, 100% { transform: rotate(-6deg) translateY(0); } 50% { transform: rotate(6deg) translateY(-6px); } }
+
+/* Trajet dessiné sur la carte */
+.trace-trajet { stroke-dasharray: 10 8; animation: trace 1s linear infinite; }
+@keyframes trace { to { stroke-dashoffset: -36; } }
+.marqueur-pulse { animation: marqueur 1.8s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes marqueur { 0% { stroke-width: 2; stroke-opacity: 1; } 100% { stroke-width: 22; stroke-opacity: 0; } }
+
+/* Survol des cartes : légère inclinaison lumineuse */
+.carte-vivante { transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease; }
+@media (hover: hover) {
+  .carte-vivante:hover { transform: translateY(-3px); box-shadow: 0 14px 30px -12px rgb(15 81 50 / 0.35); }
+}
+
+/* ===== Transitions de page (React <ViewTransition>) ===== */
+::view-transition { pointer-events: none; }
+::view-transition-group(en-tete) { animation: none; z-index: 100; }
+::view-transition-old(en-tete) { display: none; }
+::view-transition-new(en-tete) { animation: none; }
+::view-transition-group(onglets) { animation: none; z-index: 100; }
+::view-transition-old(onglets) { display: none; }
+::view-transition-new(onglets) { animation: none; }
+::view-transition-old(root) { animation: 160ms ease-out both vt-sortie; }
+::view-transition-new(root) { animation: 260ms cubic-bezier(0.2, 0.8, 0.2, 1) 80ms both vt-entree; }
+::view-transition-group(.morph) { animation-duration: 420ms; animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1); }
+::view-transition-old(.monte), ::view-transition-new(.monte) { height: 100%; }
+::view-transition-old(.descend) { animation: 150ms ease-out both vt-sortie; }
+::view-transition-new(.monte) { animation: 320ms cubic-bezier(0.2, 0.8, 0.2, 1) 120ms both vt-entree; }
+@keyframes vt-sortie { to { opacity: 0; transform: translateY(8px); filter: blur(2px); } }
+@keyframes vt-entree { from { opacity: 0; transform: translateY(24px); filter: blur(3px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*), ::view-transition-new(*), ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+  .revele { animation: none !important; }
+}

@@ -16,13 +16,15 @@ export function CarteTrajet({ depart, arrivee }: { depart?: Point; arrivee: Poin
         maxZoom: 18,
         attribution: "© OpenStreetMap",
       }).addTo(carte);
-      const arr = L.circleMarker([arrivee.lat, arrivee.lng], { radius: 10, color: "#0f5132", fillOpacity: 0.9 })
+      L.circleMarker([arrivee.lat, arrivee.lng], { radius: 10, color: "#0f5132", fill: false, className: "marqueur-pulse", interactive: false }).addTo(carte);
+      const arr = L.circleMarker([arrivee.lat, arrivee.lng], { radius: 10, color: "#ffffff", weight: 3, fillColor: "#0f5132", fillOpacity: 1 })
         .addTo(carte).bindTooltip(arrivee.nom, { permanent: true, direction: "top" });
       if (depart) {
-        L.circleMarker([depart.lat, depart.lng], { radius: 9, color: "#b43c0a", fillOpacity: 0.9 })
-          .addTo(carte).bindTooltip(`Départ : ${depart.nom}`, { permanent: true, direction: "bottom" });
-        const ligne = L.polyline([[depart.lat, depart.lng], [arrivee.lat, arrivee.lng]], { color: "#0f5132", dashArray: "8 6", weight: 4 }).addTo(carte);
-        carte.fitBounds(ligne.getBounds(), { padding: [50, 50] });
+        L.circleMarker([depart.lat, depart.lng], { radius: 9, color: "#ffffff", weight: 3, fillColor: "#b43c0a", fillOpacity: 1 })
+          .addTo(carte).bindTooltip("Départ", { permanent: true, direction: "right", offset: [10, 0] });
+        const ligne = L.polyline([[depart.lat, depart.lng], [arrivee.lat, arrivee.lng]], { color: "#0f5132", weight: 5, className: "trace-trajet", lineCap: "round" }).addTo(carte);
+        carte.setView([arrivee.lat, arrivee.lng], 14);
+        carte.flyToBounds(ligne.getBounds(), { padding: [50, 50], duration: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 1.2 });
       } else {
         carte.setView(arr.getLatLng(), 14);
       }

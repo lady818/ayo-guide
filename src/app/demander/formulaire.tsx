@@ -19,7 +19,7 @@ export function FormQuestion() {
 
   return (
     <div className="space-y-5">
-      <form ref={formRef} action={action} className="space-y-3 rounded-3xl border border-sable-fonce bg-white p-4 shadow-sm sm:p-5">
+      <form ref={formRef} action={action} className="animate-apparition space-y-3 rounded-[2rem] border border-sable-fonce bg-white p-4 shadow-lg shadow-baobab/10 transition focus-within:shadow-xl focus-within:ring-2 focus-within:ring-soleil/60 sm:p-6">
         <label htmlFor="question" className="block font-semibold">Votre question</label>
         <textarea
           id="question" name="question" rows={3} maxLength={300} value={texte}
@@ -38,7 +38,7 @@ export function FormQuestion() {
           <span aria-hidden="true">{texte.length}/300</span>
         </p>
         {etat.erreur && <p role="alert" className="rounded-xl bg-[#fdebe3] px-3 py-2 text-sm font-medium text-terre">{etat.erreur}</p>}
-        <button disabled={enCours || plus} className="appui inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-baobab px-5 font-semibold text-white hover:bg-[#0b3f27] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto">
+        <button disabled={enCours || plus} className="appui brillant inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-baobab px-5 font-semibold text-white hover:bg-[#0b3f27] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto">
           {enCours ? (
             <>
               <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-hidden="true" />
@@ -50,13 +50,13 @@ export function FormQuestion() {
 
       <div>
         <p className="mb-2 text-sm font-semibold text-gris">Idées de questions</p>
-        <ul className="flex flex-wrap gap-2">
+        <ul className="cascade flex flex-wrap gap-2">
           {EXEMPLES.map((ex) => (
             <li key={ex}>
               <button
                 type="button" disabled={enCours || plus}
                 onClick={() => { setTexte(ex); requestAnimationFrame(() => formRef.current?.requestSubmit()); }}
-                className="appui min-h-11 rounded-full border border-baobab/30 bg-white px-4 text-left text-sm font-medium text-baobab hover:bg-baobab-clair disabled:opacity-50"
+                className="appui min-h-11 rounded-full border border-baobab/25 bg-white px-4 text-left text-sm font-medium text-baobab shadow-sm transition hover:-translate-y-0.5 hover:border-baobab/50 hover:bg-baobab-clair hover:shadow-md disabled:opacity-50"
               >
                 {ex}
               </button>
@@ -68,9 +68,12 @@ export function FormQuestion() {
       <section aria-live="polite" aria-busy={enCours} className="space-y-3">
         {enCours ? (
           <>
-            <div className="flex items-center gap-3">
-              <AvatarAyo className="h-12 w-12 animate-bounce" />
-              <p className="rounded-2xl rounded-bl-none bg-white px-4 py-2 font-semibold text-baobab shadow-sm">Ayo cherche pour vous…</p>
+            <div className="flex items-end gap-3">
+              <AvatarAyo className="reflechit h-14 w-14 shadow-md" />
+              <p className="bulle-pop flex items-center gap-3 rounded-2xl rounded-bl-none bg-white px-4 py-3 font-semibold text-baobab shadow-md">
+                Ayo cherche pour vous
+                <span className="points flex items-center gap-1 text-terre" aria-hidden="true"><span /><span /><span /></span>
+              </p>
             </div>
             <SqueletteListe n={3} />
           </>
@@ -82,8 +85,8 @@ export function FormQuestion() {
             </div>
           ) : (
             <>
-              <h2 className="flex items-center gap-3 text-xl font-bold">
-                <AvatarAyo className="h-11 w-11" />
+              <h2 className="flex items-center gap-3 text-xl font-bold animate-apparition">
+                <AvatarAyo className="ayo-entree h-12 w-12 shadow-md" />
                 Ayo vous propose
               </h2>
               <ul className="cascade space-y-3">

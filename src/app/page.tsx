@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import { Suspense, ViewTransition } from "react";
 import { connection } from "next/server";
 import Link from "next/link";
 import { aujourdhuiDakar, estEnCours, heureSchema, JOJ_DEBUT, jourSchema } from "@/lib/guide";
@@ -22,33 +22,57 @@ const JOURS = Array.from({ length: 14 }, (_, i) => {
 export default function Page({ searchParams }: PageProps<"/">) {
   return (
     <div className="space-y-6">
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-baobab via-[#14653f] to-ocean px-5 py-7 text-white shadow-lg sm:px-8 sm:py-10">
-        <Soleil className="pointer-events-none absolute -left-10 -bottom-12 h-36 w-36 text-soleil/15" tourne />
-        <div className="relative flex flex-col-reverse gap-5 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative max-w-lg animate-apparition">
-          <p className="text-sm font-semibold uppercase tracking-[0.14em] text-soleil">Jeux Olympiques de la Jeunesse</p>
-          <h1 className="mt-1 text-3xl font-extrabold leading-tight sm:text-4xl">Que faire maintenant à Dakar ?</h1>
-          <p className="mt-2 text-white/90">Le programme du jour, trié par heure, avec les lieux et le temps pour y aller.</p>
-          <div className="mt-5 flex flex-wrap gap-3">
-            <Link href="/?maintenant=1" className="appui inline-flex min-h-12 items-center gap-2 whitespace-nowrap rounded-full bg-soleil px-5 font-bold text-encre shadow-md hover:bg-[#ffc21a]">
-              <span className="h-2.5 w-2.5 animate-pulsation rounded-full bg-terre" aria-hidden="true" />
-              En cours maintenant
-            </Link>
-            <Link href="/demander" className="appui inline-flex min-h-12 items-center whitespace-nowrap rounded-full border-2 border-white/70 px-5 font-semibold text-white hover:bg-white/10">
-              Demander à Ayo
-            </Link>
+      <section className="relative isolate overflow-hidden rounded-[2rem] bg-baobab px-5 pb-9 pt-6 text-white shadow-xl shadow-baobab/25 sm:px-9 sm:pb-12 sm:pt-10">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
+          <span className="aurore aurore-1 -left-16 -top-20 h-64 w-64 bg-[#1f8a5b]" />
+          <span className="aurore aurore-2 -right-10 top-10 h-72 w-72 bg-ocean" />
+          <span className="aurore aurore-3 bottom-[-6rem] left-1/3 h-60 w-60 bg-soleil/60" />
+          <Soleil className="absolute -bottom-14 -left-12 h-44 w-44 text-soleil/10" tourne />
+        </div>
+        <div className="relative flex flex-col-reverse gap-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="max-w-lg">
+            <p className="animate-apparition text-xs font-bold uppercase tracking-[0.18em] text-soleil sm:text-sm">
+              Jeux Olympiques de la Jeunesse · Dakar 2026
+            </p>
+            <h1 className="mt-2 animate-apparition text-[2rem] font-extrabold leading-[1.08] [animation-delay:80ms] sm:text-5xl">
+              Que faire <span className="texte-soleil">maintenant</span> à Dakar&nbsp;?
+            </h1>
+            <p className="mt-3 animate-apparition text-[17px] leading-relaxed text-white/90 [animation-delay:160ms]">
+              Le programme du jour, trié par heure, avec les lieux et le temps pour y aller.
+            </p>
+            <div className="mt-6 flex animate-apparition flex-wrap gap-3 [animation-delay:240ms]">
+              <Link href="/?maintenant=1" className="appui brillant inline-flex min-h-12 items-center gap-2 whitespace-nowrap rounded-full bg-soleil px-5 font-bold text-encre shadow-lg shadow-black/20 hover:bg-[#ffc21a]">
+                <span className="h-2.5 w-2.5 animate-pulsation rounded-full bg-terre" aria-hidden="true" />
+                En cours maintenant
+              </Link>
+              <Link href="/demander" className="appui inline-flex min-h-12 items-center gap-2 whitespace-nowrap rounded-full border-2 border-white/60 bg-white/5 px-5 font-semibold text-white backdrop-blur hover:bg-white/15">
+                <AvatarAyo className="h-7 w-7 ring-1" />
+                Demander à Ayo
+              </Link>
+            </div>
+          </div>
+          <div className="relative flex items-end gap-3 self-start sm:self-auto">
+            <span aria-hidden="true" className="absolute inset-x-4 -bottom-3 h-5 rounded-[50%] bg-black/25 blur-md" />
+            <div className="ayo-entree">
+              <Ayo priorite className="ayo-salut h-32 w-36 shrink-0 sm:h-60 sm:w-72" />
+            </div>
+            <p className="bulle-pop relative mb-8 rounded-2xl rounded-bl-none bg-white px-3.5 py-2 text-sm font-bold text-baobab shadow-lg [animation-delay:900ms] sm:absolute sm:-left-24 sm:top-2 sm:mb-0 sm:rounded-bl-2xl sm:rounded-br-none">
+              Salut, moi c’est Ayo&nbsp;! 👋
+            </p>
           </div>
         </div>
-        <div className="flex items-end gap-3 self-start sm:self-auto">
-          <Ayo priorite className="h-28 w-32 shrink-0 animate-flottement sm:h-56 sm:w-64" />
-          <p className="relative mb-6 rounded-2xl rounded-bl-none bg-white px-3 py-2 text-sm font-semibold text-baobab shadow-md animate-apparition [animation-delay:400ms] sm:hidden">
-            Salut, moi c’est Ayo !
-          </p>
-        </div>
-        </div>
+        <div aria-hidden="true" className="kente absolute inset-x-0 bottom-0 h-2.5" />
       </section>
-      <Suspense fallback={<SqueletteListe />}>
-        <Agenda params={searchParams as Promise<Params>} />
+      <Suspense
+        fallback={
+          <ViewTransition exit="descend" default="none">
+            <SqueletteListe />
+          </ViewTransition>
+        }
+      >
+        <ViewTransition enter="monte" default="none">
+          <Agenda params={searchParams as Promise<Params>} />
+        </ViewTransition>
       </Suspense>
     </div>
   );
@@ -67,7 +91,7 @@ async function Agenda({ params }: { params: Promise<Params> }) {
   const libelle = (j: string, o: Intl.DateTimeFormatOptions) => new Date(`${j}T12:00:00Z`).toLocaleDateString("fr-FR", { ...o, timeZone: "UTC" });
 
   return (
-    <>
+    <div className="space-y-6">
       <nav aria-label="Choisir le jour">
         <ul className="sans-barre -mx-4 flex snap-x gap-2 overflow-x-auto scroll-px-4 px-4 py-1">
           {JOURS.map((j) => {
@@ -79,7 +103,7 @@ async function Agenda({ params }: { params: Promise<Params> }) {
                   aria-current={choisi ? "date" : undefined}
                   aria-label={`${libelle(j, { weekday: "long", day: "numeric", month: "long" })}${j === aujourdhui ? ", aujourd’hui" : ""}`}
                   className={`appui flex min-h-16 w-14 flex-col items-center justify-center rounded-2xl border text-center ${
-                    choisi ? "border-baobab bg-baobab text-white shadow-md" : "border-sable-fonce bg-white hover:border-baobab/40"
+                    choisi ? "pop border-baobab bg-baobab text-white shadow-lg shadow-baobab/30" : "border-sable-fonce bg-white hover:-translate-y-0.5 hover:border-baobab/40 hover:shadow-md"
                   }`}
                 >
                   <span className={`text-[11px] font-semibold uppercase ${choisi ? "text-white/85" : "text-gris"}`}>{libelle(j, { weekday: "short" }).replace(".", "")}</span>
@@ -118,18 +142,18 @@ async function Agenda({ params }: { params: Promise<Params> }) {
         </h2>
         {liste.length === 0 ? (
           <div className="animate-apparition rounded-2xl border border-dashed border-stone-300 bg-white p-8 text-center">
-            <AvatarAyo className="mx-auto h-16 w-16" />
+            <AvatarAyo className="reflechit mx-auto h-16 w-16" />
             <p className="mt-2 font-semibold">{heure ? "Aucune animation en cours à cette heure." : "Aucune animation ce jour-là."}</p>
             {heure && <Link href={`/?jour=${jour}`} className="mt-3 inline-flex min-h-11 items-center font-semibold text-baobab underline">Voir toute la journée</Link>}
           </div>
         ) : (
           <ul className="cascade space-y-3">
             {liste.map((a) => (
-              <CarteAnimation key={a.id} a={a} enCours={heure ? true : jour === aujourdhui && estEnCours(a, now)} />
+              <CarteAnimation key={a.id} a={a} enCours={heure ? true : jour === aujourdhui && estEnCours(a, now)} instant={instant ?? (jour === aujourdhui ? now : undefined)} />
             ))}
           </ul>
         )}
       </section>
-    </>
+    </div>
   );
 }

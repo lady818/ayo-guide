@@ -1,13 +1,14 @@
-import { Suspense } from "react";
+import { Suspense, ViewTransition } from "react";
 import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { z } from "zod";
-import { estEnCours, formatDuree, formatHeure } from "@/lib/guide";
+import { estEnCours, formatHeure } from "@/lib/guide";
 import { db } from "@/server/db";
 import { animationActive, itineraire, listerLieux } from "@/server/guide";
 import { CarteTrajet } from "@/components/carte-trajet";
 import { BadgeEnCours } from "@/components/carte-animation";
+import { DureeAnimee } from "@/components/compteur";
 
 const id = z.coerce.number().int().positive();
 
@@ -43,10 +44,14 @@ async function Detail({ params, searchParams }: { params: Promise<{ id: string }
         <span aria-hidden="true">←</span> Retour à l’agenda
       </Link>
 
-      <section className="animate-apparition relative overflow-hidden rounded-3xl bg-white p-5 shadow-sm ring-1 ring-sable-fonce sm:p-7">
-        <span className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-baobab via-soleil to-terre" aria-hidden="true" />
+      <section className="animate-apparition relative overflow-hidden rounded-[2rem] bg-white p-5 pt-7 shadow-lg shadow-baobab/10 ring-1 ring-sable-fonce sm:p-8 sm:pt-9">
+        <span className="kente absolute inset-x-0 top-0 h-2" aria-hidden="true" />
         {estEnCours(a, new Date()) && <div className="mb-2"><BadgeEnCours /></div>}
-        <h1 className="text-2xl font-extrabold leading-tight sm:text-3xl">{a.titre}</h1>
+        <h1 className="text-2xl font-extrabold leading-tight sm:text-4xl">
+          <ViewTransition name={`titre-${a.id}`} share="morph" default="none">
+            <span className="inline-block">{a.titre}</span>
+          </ViewTransition>
+        </h1>
         <dl className="mt-3 grid gap-2 sm:grid-cols-2">
           <div className="flex items-center gap-2 rounded-xl bg-sable p-3">
             <dt className="text-xl" aria-hidden="true">🕒</dt>
@@ -73,20 +78,20 @@ async function Detail({ params, searchParams }: { params: Promise<{ id: string }
               {lieux.filter((l) => l.id !== a.lieuId).map((l) => <option key={l.id} value={l.id}>{l.nom}</option>)}
             </select>
           </div>
-          <button className="appui h-12 rounded-xl bg-baobab px-5 font-semibold text-white hover:bg-[#0b3f27]">Calculer</button>
+          <button className="appui brillant h-12 rounded-xl bg-baobab px-5 font-semibold text-white hover:bg-[#0b3f27]">Calculer</button>
           {trajet && "erreur" in trajet && <p id="erreur-depart" role="alert" className="w-full text-sm font-medium text-terre">{trajet.erreur}</p>}
         </form>
 
         {ok && (
           <div className="cascade grid grid-cols-2 gap-3" aria-live="polite">
-            <div className="rounded-2xl bg-baobab-clair p-4 text-center">
-              <p className="text-3xl" aria-hidden="true">🚶🏾</p>
-              <p className="font-display text-2xl font-extrabold text-baobab">{formatDuree(ok.piedMin)}</p>
+            <div className="carte-vivante rounded-3xl bg-baobab-clair p-4 text-center sm:p-6">
+              <p className="text-4xl animate-flottement" aria-hidden="true">🚶🏾</p>
+              <p className="font-display text-3xl font-extrabold text-baobab"><DureeAnimee minutes={ok.piedMin} /></p>
               <p className="text-sm font-medium text-gris">à pied</p>
             </div>
-            <div className="rounded-2xl bg-[#fdf1d6] p-4 text-center">
-              <p className="text-3xl" aria-hidden="true">🚗</p>
-              <p className="font-display text-2xl font-extrabold text-[#7a4b00]">{formatDuree(ok.voitureMin)}</p>
+            <div className="carte-vivante rounded-3xl bg-[#fdf1d6] p-4 text-center sm:p-6">
+              <p className="text-4xl animate-flottement [animation-delay:-3s]" aria-hidden="true">🚗</p>
+              <p className="font-display text-3xl font-extrabold text-[#7a4b00]"><DureeAnimee minutes={ok.voitureMin} /></p>
               <p className="text-sm font-medium text-gris">en voiture</p>
             </div>
             <p className="col-span-2 text-xs text-gris">

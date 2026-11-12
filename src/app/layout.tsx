@@ -29,7 +29,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <a href="#contenu" className="sr-only z-50 rounded-lg bg-soleil px-4 py-3 font-semibold text-encre focus:not-sr-only focus:fixed focus:left-3 focus:top-3">
           Aller au contenu
         </a>
-        <header className="sticky top-0 z-30 bg-baobab text-white shadow-md shadow-baobab/20">
+        <header style={{ viewTransitionName: "en-tete" }} className="sticky top-0 z-30 bg-baobab/95 text-white shadow-md shadow-baobab/20 backdrop-blur">
           <nav aria-label="Navigation" className="mx-auto flex max-w-4xl items-center justify-between gap-3 px-4 py-2.5 sm:py-3">
             <Link href="/" aria-label="Ayo Guide, accueil" className="appui flex min-h-11 items-center rounded-lg">
               <Logo />
@@ -38,6 +38,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <NavHaut />
             </Suspense>
           </nav>
+          <div aria-hidden="true" className="kente h-1 opacity-90" />
         </header>
         <main id="contenu" className="mx-auto w-full max-w-4xl flex-1 px-4 pb-28 pt-5 sm:pb-12 sm:pt-8">
           {children}

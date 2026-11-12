@@ -14,8 +14,8 @@ export function Soleil({ className = "", tourne = false }: { className?: string;
 
 export function Logo() {
   return (
-    <span className="flex items-center gap-2">
-      <Soleil className="h-8 w-8 text-soleil" tourne />
+    <span className="group flex items-center gap-2">
+      <Soleil className="h-8 w-8 text-soleil transition-transform duration-700 group-hover:rotate-90 group-hover:scale-110" tourne />
       <span className="leading-none">
         <span className="block font-display text-xl font-extrabold tracking-tight">Ayo Guide</span>
         <span className="block text-[11px] font-medium uppercase tracking-[0.14em] text-white/80">JOJ Dakar 2026</span>

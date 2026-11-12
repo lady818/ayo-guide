@@ -55,7 +55,7 @@ export function NavBas() {
 
 export function OngletsBas({ pathname }: { pathname: string }) {
   return (
-    <nav aria-label="Navigation principale" className="fixed inset-x-0 bottom-0 z-20 border-t border-sable-fonce bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur sm:hidden">
+    <nav aria-label="Navigation principale" style={{ viewTransitionName: "onglets" }} className="fixed inset-x-0 bottom-0 z-20 border-t border-sable-fonce bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur sm:hidden">
       <ul className="grid grid-cols-3">
         {LIENS.map((l) => {
           const estActif = actif(pathname, l.href);
@@ -68,7 +68,7 @@ export function OngletsBas({ pathname }: { pathname: string }) {
                   estActif ? "text-baobab" : "text-gris"
                 }`}
               >
-                <span className={`flex h-8 w-14 items-center justify-center rounded-full transition-colors ${estActif ? "bg-baobab-clair" : ""}`}>
+                <span className={`flex h-8 w-14 items-center justify-center rounded-full transition-all duration-300 ${estActif ? "scale-110 bg-baobab-clair" : ""}`}>
                   <Icone d={l.icone} />
                 </span>
                 {l.label}
