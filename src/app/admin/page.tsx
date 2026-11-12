@@ -27,8 +27,8 @@ async function Admin({ params }: { params: Promise<{ jour?: string }> }) {
   }
   const p = await params;
   const jour = jourSchema.safeParse(p.jour).success ? p.jour! : aujourdhuiDakar();
-  const liste = agendaDuJour(db(), jour);
-  const lieux = listerLieux(db());
+  const base = await db();
+  const [liste, lieux] = await Promise.all([agendaDuJour(base, jour), listerLieux(base)]);
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

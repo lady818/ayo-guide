@@ -1,4 +1,4 @@
-import type { DatabaseSync } from "node:sqlite";
+import type { Pool } from "pg";
 import { JOJ_DEBUT, JOJ_FIN_EXCLUE } from "@/lib/guide";
 
 // Sites connus du guide (coordonnées approximatives).
@@ -28,43 +28,55 @@ const JOURNEE_TYPE: [string, string, string, string, number][] = [
   ["Soirée concert des Jeux", "Grand concert de clôture de la journée.", "18:00", "22:00", 4],
 ];
 
-export function initialiser(base: DatabaseSync, avecDemo = true) {
-  base.exec(`
-    PRAGMA foreign_keys = ON;
+export async function initialiser(base: Pool, avecDemo = true) {
+  await base.query(`
     CREATE TABLE IF NOT EXISTS lieu (
-      id INTEGER PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       nom TEXT NOT NULL UNIQUE,
-      lat REAL NOT NULL,
-      lng REAL NOT NULL
+      lat DOUBLE PRECISION NOT NULL,
+      lng DOUBLE PRECISION NOT NULL
     );
     CREATE TABLE IF NOT EXISTS animation (
-      id INTEGER PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       titre TEXT NOT NULL CHECK (length(titre) BETWEEN 1 AND 120),
       description TEXT NOT NULL DEFAULT '',
-      debut TEXT NOT NULL,
-      fin TEXT NOT NULL,
+      debut TIMESTAMPTZ NOT NULL,
+      fin TIMESTAMPTZ NOT NULL,
       lieu_id INTEGER NOT NULL REFERENCES lieu(id),
-      retiree_le TEXT,
+      retiree_le TIMESTAMPTZ,
       CHECK (fin > debut),
       CHECK (debut >= '${JOJ_DEBUT}' AND fin <= '${JOJ_FIN_EXCLUE}'),
       UNIQUE (titre, debut, lieu_id)
     );
     CREATE INDEX IF NOT EXISTS animation_debut ON animation(debut);
+    CREATE TABLE IF NOT EXISTS essai (
+      cle TEXT NOT NULL,
+      quand TIMESTAMPTZ NOT NULL DEFAULT now()
+    );
+    CREATE INDEX IF NOT EXISTS essai_cle ON essai(cle, quand);
   `);
-  const nbLieux = base.prepare("SELECT count(*) AS n FROM lieu").get() as { n: number };
-  if (nbLieux.n > 0) return;
+  const { rows } = await base.query<{ n: number }>("SELECT count(*)::int AS n FROM lieu");
+  if (rows[0].n >= LIEUX_CONNUS.length) return;
 
-  const insLieu = base.prepare("INSERT INTO lieu (nom, lat, lng) VALUES (?, ?, ?)");
-  const ids = LIEUX_CONNUS.map(([nom, lat, lng]) => Number(insLieu.run(nom, lat, lng).lastInsertRowid));
+  for (const [nom, lat, lng] of LIEUX_CONNUS)
+    await base.query("INSERT INTO lieu (nom, lat, lng) VALUES ($1, $2, $3) ON CONFLICT (nom) DO NOTHING", [nom, lat, lng]);
   if (!avecDemo) return;
 
-  const insAnim = base.prepare(
-    "INSERT INTO animation (titre, description, debut, fin, lieu_id) VALUES (?, ?, ?, ?, ?)",
+  const ids = new Map(
+    (await base.query<{ id: number; nom: string }>("SELECT id, nom FROM lieu")).rows.map((l) => [l.nom, l.id]),
   );
+  const valeurs: unknown[] = [];
+  const lignes: string[] = [];
   for (let jour = new Date(JOJ_DEBUT); jour.toISOString() < JOJ_FIN_EXCLUE; jour.setUTCDate(jour.getUTCDate() + 1)) {
     const j = jour.toISOString().slice(0, 10);
     for (const [titre, desc, d, f, lieu] of JOURNEE_TYPE) {
-      insAnim.run(titre, desc, `${j}T${d}:00.000Z`, `${j}T${f}:00.000Z`, ids[lieu]);
+      const n = valeurs.length;
+      lignes.push(`($${n + 1}, $${n + 2}, $${n + 3}, $${n + 4}, $${n + 5})`);
+      valeurs.push(titre, desc, `${j}T${d}:00.000Z`, `${j}T${f}:00.000Z`, ids.get(LIEUX_CONNUS[lieu][0]));
     }
   }
+  await base.query(
+    `INSERT INTO animation (titre, description, debut, fin, lieu_id) VALUES ${lignes.join(",")} ON CONFLICT DO NOTHING`,
+    valeurs,
+  );
 }

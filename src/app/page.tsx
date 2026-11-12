@@ -24,7 +24,7 @@ async function Agenda({ params }: { params: Promise<Params> }) {
   const jour = maintenant ? aujourdhuiDakar() : jourSchema.safeParse(p.jour).success ? p.jour! : aujourdhuiDakar();
   const heure = maintenant ? now.toISOString().slice(11, 16) : heureSchema.safeParse(p.a).success ? p.a! : undefined;
   const instant = heure ? new Date(`${jour}T${heure}:00.000Z`) : undefined;
-  const liste = agendaDuJour(db(), jour, instant);
+  const liste = await agendaDuJour(await db(), jour, instant);
   const dateLisible = new Date(`${jour}T12:00:00Z`).toLocaleDateString("fr-FR", {
     weekday: "long", day: "numeric", month: "long", timeZone: "UTC",
   });

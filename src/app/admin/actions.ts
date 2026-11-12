@@ -41,7 +41,7 @@ export async function importAction(_: EtatImport, form: FormData): Promise<EtatI
     return { erreur: "Le fichier n’est pas un JSON valide." };
   }
   try {
-    const bilan = importerProgramme(db(), donnees);
+    const bilan = await importerProgramme(await db(), donnees);
     refresh();
     return { bilan };
   } catch (e) {
@@ -55,6 +55,6 @@ export async function retirerAction(form: FormData) {
   if (!(await estAdmin())) throw new Error("Accès refusé.");
   const id = idSchema.safeParse(form.get("id"));
   if (!id.success) throw new Error("Identifiant invalide.");
-  retirerAnimation(db(), id.data);
+  await retirerAnimation(await db(), id.data);
   refresh();
 }

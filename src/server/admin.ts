@@ -1,11 +1,12 @@
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { cookies, headers } from "next/headers";
+import { db } from "./db";
+import { consommerEssai, effacerEssais } from "./guide";
 
 const COOKIE = "guide_admin";
 const DUREE_MS = 8 * 60 * 60 * 1000;
 const MAX_ESSAIS = 5;
 const FENETRE_MS = 15 * 60 * 1000;
-const essais = new Map<string, { n: number; depuis: number }>();
 
 function codeAdmin(): string {
   const code = process.env.ADMIN_CODE;
@@ -26,18 +27,12 @@ function egal(a: string, b: string): boolean {
 
 /** Vérifie le code (avec limitation des essais) et ouvre une session admin. */
 export async function connecterAdmin(code: unknown): Promise<string | null> {
-  const ip = (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
-  const maintenant = Date.now();
-  const e = essais.get(ip);
-  if (e && maintenant - e.depuis < FENETRE_MS && e.n >= MAX_ESSAIS)
-    return "Trop d’essais. Réessayez dans 15 minutes.";
-  if (typeof code !== "string" || !egal(code, codeAdmin())) {
-    const actuel = e && maintenant - e.depuis < FENETRE_MS ? e : { n: 0, depuis: maintenant };
-    essais.set(ip, { n: actuel.n + 1, depuis: actuel.depuis });
-    return "Code d’accès incorrect.";
-  }
-  essais.delete(ip);
-  const expire = maintenant + DUREE_MS;
+  const cle = `admin:${await adresseIp()}`;
+  const base = await db();
+  if (!(await consommerEssai(base, cle, MAX_ESSAIS, FENETRE_MS))) return "Trop d’essais. Réessayez dans 15 minutes.";
+  if (typeof code !== "string" || !egal(code, codeAdmin())) return "Code d’accès incorrect.";
+  await effacerEssais(base, cle);
+  const expire = Date.now() + DUREE_MS;
   (await cookies()).set(COOKIE, `${expire}.${signer(expire)}`, {
     httpOnly: true,
     sameSite: "lax",
@@ -46,6 +41,11 @@ export async function connecterAdmin(code: unknown): Promise<string | null> {
     maxAge: DUREE_MS / 1000,
   });
   return null;
+}
+
+export async function adresseIp(): Promise<string> {
+  const h = await headers();
+  return h.get("x-real-ip") || h.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
 }
 
 export async function estAdmin(): Promise<boolean> {

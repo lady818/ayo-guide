@@ -22,16 +22,16 @@ async function Detail({ params, searchParams }: { params: Promise<{ id: string }
   await connection();
   const animId = id.safeParse((await params).id);
   if (!animId.success) notFound();
-  const base = db();
-  const a = animationActive(base, animId.data);
+  const base = await db();
+  const a = await animationActive(base, animId.data);
   if (!a) notFound();
-  const lieux = listerLieux(base);
+  const lieux = await listerLieux(base);
   const arrivee = lieux.find((l) => l.id === a.lieuId)!;
   const departBrut = (await searchParams).depart;
-  let trajet: ReturnType<typeof itineraire> | null = null;
+  let trajet: Awaited<ReturnType<typeof itineraire>> | null = null;
   if (departBrut !== undefined) {
     const d = id.safeParse(departBrut);
-    trajet = d.success ? itineraire(base, a.id, d.data) : { erreur: "Site de départ inconnu." };
+    trajet = d.success ? await itineraire(base, a.id, d.data) : { erreur: "Site de départ inconnu." };
   }
   const ok = trajet && !("erreur" in trajet) ? trajet : null;
 

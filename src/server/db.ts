@@ -1,17 +1,24 @@
-import { DatabaseSync } from "node:sqlite";
-import { mkdirSync } from "node:fs";
-import path from "node:path";
+import { Pool } from "pg";
 import { initialiser } from "./schema";
 
-const globalPourDb = globalThis as unknown as { guideDb?: DatabaseSync };
+const g = globalThis as unknown as { guidePool?: Pool; guidePret?: Promise<void> };
 
-export function db(): DatabaseSync {
-  if (!globalPourDb.guideDb) {
-    const dossier = path.join(process.cwd(), "data");
-    mkdirSync(dossier, { recursive: true });
-    const base = new DatabaseSync(process.env.GUIDE_DB ?? path.join(dossier, "guide.db"));
-    initialiser(base);
-    globalPourDb.guideDb = base;
+/** Pool PostgreSQL (DATABASE_URL), tables créées et données de démo chargées au premier appel. */
+export async function db(): Promise<Pool> {
+  if (!g.guidePool) {
+    const url = process.env.DATABASE_URL;
+    if (!url) throw new Error("DATABASE_URL manquante.");
+    g.guidePool = new Pool({
+      connectionString: url,
+      max: 3,
+      ssl: /localhost|127\.0\.0\.1/.test(url) ? false : { rejectUnauthorized: true },
+    });
+    g.guidePret = initialiser(g.guidePool).catch((e) => {
+      g.guidePret = undefined;
+      g.guidePool = undefined;
+      throw e;
+    });
   }
-  return globalPourDb.guideDb;
+  await g.guidePret;
+  return g.guidePool!;
 }
