@@ -1,6 +1,7 @@
 "use client";
 import { useActionState, useRef, useState } from "react";
 import { CarteAnimation, SqueletteListe } from "@/components/carte-animation";
+import { AvatarAyo } from "@/components/ayo";
 import { questionAction, type EtatQuestion } from "./actions";
 
 const EXEMPLES = [
@@ -66,20 +67,30 @@ export function FormQuestion() {
 
       <section aria-live="polite" aria-busy={enCours} className="space-y-3">
         {enCours ? (
-          <SqueletteListe n={3} />
+          <>
+            <div className="flex items-center gap-3">
+              <AvatarAyo className="h-12 w-12 animate-bounce" />
+              <p className="rounded-2xl rounded-bl-none bg-white px-4 py-2 font-semibold text-baobab shadow-sm">Ayo cherche pour vous…</p>
+            </div>
+            <SqueletteListe n={3} />
+          </>
         ) : etat.suggestions ? (
           etat.suggestions.length === 0 ? (
-            <p className="animate-apparition rounded-2xl border border-dashed border-stone-300 bg-white p-6 text-center">
-              Aucune animation du jour ne correspond. Essayez une autre question.
-            </p>
+            <div className="animate-apparition rounded-2xl border border-dashed border-stone-300 bg-white p-6 text-center">
+              <AvatarAyo className="mx-auto mb-2 h-14 w-14" />
+              <p>Aucune animation du jour ne correspond. Essayez une autre question.</p>
+            </div>
           ) : (
             <>
-              <h2 className="text-xl font-bold">Ayo vous propose</h2>
+              <h2 className="flex items-center gap-3 text-xl font-bold">
+                <AvatarAyo className="h-11 w-11" />
+                Ayo vous propose
+              </h2>
               <ul className="cascade space-y-3">
                 {etat.suggestions.map((s) => (
                   <CarteAnimation key={s.animation.id} a={s.animation}>
                     <p className="mt-2 flex gap-2 rounded-xl bg-baobab-clair p-3 text-[15px] leading-relaxed">
-                      <span aria-hidden="true">💬</span>
+                      <AvatarAyo className="h-7 w-7" />
                       <span><span className="sr-only">Pourquoi : </span>{s.pourquoi}</span>
                     </p>
                   </CarteAnimation>

@@ -6,6 +6,7 @@ import { db } from "@/server/db";
 import { agendaDuJour } from "@/server/guide";
 import { CarteAnimation, SqueletteListe } from "@/components/carte-animation";
 import { Soleil } from "@/components/logo";
+import { Ayo, AvatarAyo } from "@/components/ayo";
 import { CentrerJour } from "@/components/centrer-jour";
 
 const majuscule = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
@@ -22,8 +23,9 @@ export default function Page({ searchParams }: PageProps<"/">) {
   return (
     <div className="space-y-6">
       <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-baobab via-[#14653f] to-ocean px-5 py-7 text-white shadow-lg sm:px-8 sm:py-10">
-        <Soleil className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 text-soleil/80 animate-flottement sm:-right-8 sm:-top-10 sm:h-52 sm:w-52 sm:text-soleil/90" tourne />
-        <div className="relative max-w-lg pr-10 animate-apparition sm:pr-0">
+        <Soleil className="pointer-events-none absolute -left-10 -bottom-12 h-36 w-36 text-soleil/15" tourne />
+        <div className="relative flex flex-col-reverse gap-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative max-w-lg animate-apparition">
           <p className="text-sm font-semibold uppercase tracking-[0.14em] text-soleil">Jeux Olympiques de la Jeunesse</p>
           <h1 className="mt-1 text-3xl font-extrabold leading-tight sm:text-4xl">Que faire maintenant à Dakar ?</h1>
           <p className="mt-2 text-white/90">Le programme du jour, trié par heure, avec les lieux et le temps pour y aller.</p>
@@ -33,9 +35,16 @@ export default function Page({ searchParams }: PageProps<"/">) {
               En cours maintenant
             </Link>
             <Link href="/demander" className="appui inline-flex min-h-12 items-center whitespace-nowrap rounded-full border-2 border-white/70 px-5 font-semibold text-white hover:bg-white/10">
-              Demander à l’assistant
+              Demander à Ayo
             </Link>
           </div>
+        </div>
+        <div className="flex items-end gap-3 self-start sm:self-auto">
+          <Ayo priorite className="h-28 w-32 shrink-0 animate-flottement sm:h-56 sm:w-64" />
+          <p className="relative mb-6 rounded-2xl rounded-bl-none bg-white px-3 py-2 text-sm font-semibold text-baobab shadow-md animate-apparition [animation-delay:400ms] sm:hidden">
+            Salut, moi c’est Ayo !
+          </p>
+        </div>
         </div>
       </section>
       <Suspense fallback={<SqueletteListe />}>
@@ -109,7 +118,7 @@ async function Agenda({ params }: { params: Promise<Params> }) {
         </h2>
         {liste.length === 0 ? (
           <div className="animate-apparition rounded-2xl border border-dashed border-stone-300 bg-white p-8 text-center">
-            <p className="text-4xl" aria-hidden="true">🌙</p>
+            <AvatarAyo className="mx-auto h-16 w-16" />
             <p className="mt-2 font-semibold">{heure ? "Aucune animation en cours à cette heure." : "Aucune animation ce jour-là."}</p>
             {heure && <Link href={`/?jour=${jour}`} className="mt-3 inline-flex min-h-11 items-center font-semibold text-baobab underline">Voir toute la journée</Link>}
           </div>
