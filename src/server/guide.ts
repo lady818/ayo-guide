@@ -94,3 +94,9 @@ export async function consommerEssai(base: Pool, cle: string, max: number, fenet
 export async function effacerEssais(base: Pool, cle: string) {
   await base.query("DELETE FROM essai WHERE cle = $1", [cle]);
 }
+
+export async function compterEssais(base: Pool, cle: string, fenetreMs: number): Promise<number> {
+  const depuis = new Date(Date.now() - fenetreMs).toISOString();
+  const { rows } = await base.query<{ n: number }>("SELECT count(*)::int AS n FROM essai WHERE cle = $1 AND quand >= $2", [cle, depuis]);
+  return rows[0].n;
+}

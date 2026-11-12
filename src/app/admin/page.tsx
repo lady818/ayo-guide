@@ -20,7 +20,7 @@ async function Admin({ params }: { params: Promise<{ jour?: string }> }) {
   if (!(await estAdmin())) {
     return (
       <div className="space-y-4">
-        <h1 className="text-2xl font-bold">Espace admin</h1>
+        <h1 className="text-3xl font-extrabold">Espace admin</h1>
         <FormConnexion />
       </div>
     );
@@ -32,8 +32,8 @@ async function Admin({ params }: { params: Promise<{ jour?: string }> }) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Espace admin</h1>
-        <form action={deconnexionAction}><button className="py-2 text-sm text-stone-600 underline">Se déconnecter</button></form>
+        <h1 className="text-3xl font-extrabold">Espace admin</h1>
+        <form action={deconnexionAction}><button className="py-2 text-sm text-gris underline">Se déconnecter</button></form>
       </div>
       <FormImport />
       <details className="rounded-xl bg-white p-4 text-sm shadow-sm">
@@ -44,22 +44,22 @@ async function Admin({ params }: { params: Promise<{ jour?: string }> }) {
         <form className="flex items-end gap-3" action="/admin">
           <label className="flex flex-col text-sm font-medium">
             Animations du
-            <input type="date" name="jour" defaultValue={jour} className="mt-1 h-11 rounded-lg border border-stone-300 px-3" />
+            <input type="date" name="jour" defaultValue={jour} className="mt-1 h-12 rounded-xl border border-stone-300 bg-sable px-3 text-base" />
           </label>
-          <button className="h-11 rounded-lg bg-stone-200 px-4 font-medium">Voir</button>
+          <button className="appui h-12 rounded-xl bg-sable-fonce px-5 font-semibold">Voir</button>
         </form>
-        <ul className="divide-y rounded-xl bg-white shadow-sm">
+        <ul className="divide-y divide-sable-fonce overflow-hidden rounded-2xl border border-sable-fonce bg-white shadow-sm">
           {liste.map((a) => (
             <li key={a.id} className="flex items-center gap-3 p-3">
               <span className="w-28 font-mono text-sm">{formatHeure(a.debut)}–{formatHeure(a.fin)}</span>
-              <span className="min-w-0 flex-1 text-sm"><strong>{a.titre}</strong><br /><span className="text-stone-500">{a.lieu}</span></span>
+              <span className="min-w-0 flex-1 text-sm"><strong>{a.titre}</strong><br /><span className="text-gris">{a.lieu}</span></span>
               <form action={retirerAction}>
                 <input type="hidden" name="id" value={a.id} />
-                <button className="h-11 rounded-lg border border-red-300 px-3 text-sm font-medium text-red-700 hover:bg-red-50">Retirer</button>
+                <button aria-label={`Retirer « ${a.titre} »`} className="appui h-11 rounded-xl border border-terre/40 px-4 text-sm font-semibold text-terre hover:bg-[#fdebe3]">Retirer</button>
               </form>
             </li>
           ))}
-          {liste.length === 0 && <li className="p-3 text-sm text-stone-500">Aucune animation ce jour-là.</li>}
+          {liste.length === 0 && <li className="p-3 text-sm text-gris">Aucune animation ce jour-là.</li>}
         </ul>
       </section>
     </div>

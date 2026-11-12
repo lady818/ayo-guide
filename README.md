@@ -1,4 +1,4 @@
-# Guide JOJ Dakar 2026
+# Ayo Guide — JOJ Dakar 2026
 
 « Qu’est-ce que je peux faire maintenant, où, et comment y aller ? »
 
@@ -19,8 +19,8 @@ extrait de programme de démonstration (même journée type chaque jour des Jeux
 
 https://guide-joj-dakar.vercel.app — Vercel (projet `guide-joj-dakar`) + base Neon.
 Mise à jour : `npx vercel deploy --prod`. Variables de production : `ADMIN_CODE`, `ANTHROPIC_API_KEY`,
-`DATABASE_URL` (ajoutée par l’intégration Neon). Questions à l’IA limitées à 10 / 10 min par
-personne et 500 / jour au total.
+`DATABASE_URL` (ajoutée par l’intégration Neon). Questions à l’IA limitées à 5 par personne
+et par 24 h, 500 / jour au total.
 
 ## Tranches
 
