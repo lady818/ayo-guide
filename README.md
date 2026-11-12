@@ -11,9 +11,16 @@ pnpm dev                     # http://localhost:3000
 pnpm test                    # règles du PRD (Vitest)
 ```
 
-Base SQLite intégrée à Node (`node:sqlite`, Node ≥ 24) dans `data/guide.db`, créée au premier
-lancement avec les sites connus et un extrait de programme de démonstration (même journée type
-chaque jour des Jeux). Supprimer `data/guide.db` pour repartir de zéro.
+Base PostgreSQL (`DATABASE_URL`) : tables créées au premier appel, avec les sites connus et un
+extrait de programme de démonstration (même journée type chaque jour des Jeux). En local, la base
+`guide_joj` du conteneur Docker de Budgety ; les tests utilisent `guide_joj_test`.
+
+## En ligne
+
+https://guide-joj-dakar.vercel.app — Vercel (projet `guide-joj-dakar`) + base Neon.
+Mise à jour : `npx vercel deploy --prod`. Variables de production : `ADMIN_CODE`, `ANTHROPIC_API_KEY`,
+`DATABASE_URL` (ajoutée par l’intégration Neon). Questions à l’IA limitées à 10 / 10 min par
+personne et 500 / jour au total.
 
 ## Tranches
 
@@ -30,4 +37,3 @@ Format d’import : `[{ "titre", "description", "debut": "2026-11-07T14:00", "fi
 ## Limites connues
 - Le droit de reprendre le programme officiel reste à vérifier (risque du PRD) ; les données de démo sont fictives.
 - Tracé de carte indicatif (ligne droite), pas un calcul d’itinéraire routier.
-- Limitation des essais admin en mémoire (réinitialisée au redémarrage).
