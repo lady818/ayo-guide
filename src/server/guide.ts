@@ -10,7 +10,7 @@ const SELECT_ACTIVES = `
   WHERE a.retiree_le IS NULL`;
 
 export function listerLieux(base: DatabaseSync): Lieu[] {
-  return base.prepare("SELECT id, nom, lat, lng FROM lieu ORDER BY nom").all() as Lieu[];
+  return (base.prepare("SELECT id, nom, lat, lng FROM lieu ORDER BY nom").all() as Lieu[]).map((l) => ({ ...l }));
 }
 
 /** Agenda d'une journée (AAAA-MM-JJ), trié par heure ; filtré « en cours » si `a` est donné. */
@@ -18,12 +18,13 @@ export function agendaDuJour(base: DatabaseSync, jour: string, a?: Date): Animat
   const lignes = base
     .prepare(`${SELECT_ACTIVES} AND a.debut >= ? AND a.debut < ?`)
     .all(`${jour}T00:00:00.000Z`, `${jour}T23:59:59.999Z`) as AnimationAvecLieu[];
-  const triees = trierParDebut(lignes);
+  const triees = trierParDebut(lignes.map((l) => ({ ...l }))); // objets simples (sérialisables par React)
   return a ? triees.filter((x) => estEnCours(x, a)) : triees;
 }
 
 export function animationActive(base: DatabaseSync, id: number): AnimationAvecLieu | null {
-  return (base.prepare(`${SELECT_ACTIVES} AND a.id = ?`).get(id) as AnimationAvecLieu | undefined) ?? null;
+  const r = base.prepare(`${SELECT_ACTIVES} AND a.id = ?`).get(id) as AnimationAvecLieu | undefined;
+  return r ? { ...r } : null;
 }
 
 export type BilanImport = { ajoutees: number; ignorees: number; ecartees: { ligne: number; raison: string }[] };
